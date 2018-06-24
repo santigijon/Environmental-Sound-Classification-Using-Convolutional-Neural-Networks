@@ -6,6 +6,10 @@
 # All rights reserved to: Santiago Álvarez-Buylla Puente
 # Last modification: 24/06/2018
 
+import numpy as np
+import librosa
+import math
+
 
 def extend_file(input_file, sampling_rate, desired_length_seconds):
 
