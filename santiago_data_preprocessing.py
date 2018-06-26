@@ -39,7 +39,6 @@ def extend_file(input_file, sampling_rate, desired_length_seconds):
 def voss(nrows, ncols=16, seed = 1):
 
 #Generates pink noise using the Voss-McCartney algorithm. code taken from: https://www.dsprelated.com/showarticle/908.php
-    
     #Inputs:
         #nrows: number of values to generate
         #rcols: number of random sources to add
@@ -220,6 +219,93 @@ def get_mel_spectrogram(x, sampling_rate, number_mel_bands, window_size, hop_len
 
 
 
+def order_files(x, y, class_ids):
+# A helper function to order the audio files in order to make easier their 
+# posterior mixing. The files are ordered by their class id. From 0 to 9
+    #Inputs:
+        # x - array with all the audio clips from get_files_and_resample, size = (duration*sampling_rate_new, number_of_examples)
+        # y - array with the label ids
+
+    ordered_list_files = []
+    ordered_list_labels = []
+
+    for i in range(len(class_ids)):
+        
+        for ii in range(x.shape[1]):
+            
+            if class_ids[i] == y[ii]:
+                
+                ordered_list_files.append(x[:,ii])
+                ordered_list_labels.append(y[ii])
+
+    ordered_x = np.array(ordered_list_files)
+    ordered_y = np.array(ordered_list_labels)
+
+    return np.transpose(ordered_x), ordered_y
+
+
+
+def mix_files(x, y, examples_per_class = 28):
+# A function to mix the files in pairs. The mixing is performed in such a way that
+# for ten files corresponding to ten different classes in one folder, 45 (9+8+7+...+1) combinations are created
+    #Inputs:
+        # x - array of size (audio_samples, examples)
+        # y - array containing the labels of each example,  size = (examples,)
+        # class_ids - list containing 
+        # examples_per_class - integer, representing the number of audio examples per class and folder that are to be combined
+    #Returns:
+        # array with the mixed audio files, array of size = (audio_samples, 28*45)
+        # y_list - list containing the mixed classes ids, in the way [class_id_1-class_id_2,...]
+    
+    x_list = []
+    y_list = []
+
+    number_classes = 10
+
+    for index in range(number_classes):       # The three for loops informally explained:
+                                              # For each class in the present folder, run through every example of that class
+        for i in range(examples_per_class):   # and combine it with one example of each other class (thus the 3rd loop)
+
+            for ii in range(number_classes):
+
+                if (index * examples_per_class + i) >= (ii * examples_per_class + i):
+                    continue
+
+                x_list.append(x[:, index * examples_per_class + i] + x[:, ii * examples_per_class + i])
+
+                y_list.append(str(y[index * examples_per_class + i]) + '-' + str(y[ii * examples_per_class + i]))
+        
+    return np.transpose(np.array(x_list)), y_list
+
+
+
+def one_hot_encode_mine(y_mixed):
+# A function to one hot encode the labels of the combined files. That is, for every label, two "1" will appear in the 
+# array, such as for example: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+    #Inputs:
+        #y_mixed - a list containing the combined ids of the audio examples in the form [3-2, 4-8, ...] for example
+    #Returns:
+        #y_mixed_one_hot - an array containing the one hot encoded class ids, size = (number_of_examples, 10)
+    
+    y_mixed_one_hot = []
+    
+    for i in range(len(y_mixed)):
+        
+        lista = [0,0,0,0,0,0,0,0,0,0]
+        
+        a = y_mixed[i].split('-')[0]
+        b = y_mixed[i].split('-')[1]
+        
+        lista[int(a)] = 1
+        lista[int(b)] = 1
+        
+        y_mixed_one_hot.append(np.array(lista))
+
+    y_mixed_one_hot = np.array(y_mixed_one_hot)
+
+    return y_mixed_one_hot
+
+
 
 def split_into_clips (input_file, sampling_rate, clip_duration):
     
@@ -241,7 +327,36 @@ def split_into_clips (input_file, sampling_rate, clip_duration):
     return clips
 
 
-
+def split_ordered_files(x_ordered, y_ordered, test_percentage = 10, num_classes = 10):
+    
+    x_train = []
+    y_train = []
+    x_val = []
+    y_val = []
+    x_test = []
+    y_test = []
+    
+    test_examples = x_ordered.shape[1] * test_percentage / 100
+    train_examples = x_ordered.shape[1] - 2 * test_examples
+    
+    examples_per_class = int(x_ordered.shape[1] / num_classes)
+    train_examples_per_class = int(train_examples / num_classes)
+    test_examples_per_class = int(test_examples / num_classes)
+    
+    for i in range(num_classes):
+      
+        x_train.append(x_ordered[:, (i * examples_per_class) : (i * examples_per_class) + train_examples_per_class])
+        y_train.append(y_ordered[(i * examples_per_class) : (i * examples_per_class) + train_examples_per_class])
+        
+        x_val.append(x_ordered[:, (i * examples_per_class) + train_examples_per_class : (i * examples_per_class) + train_examples_per_class + test_examples_per_class])
+        y_val.append(y_ordered[(i * examples_per_class) + train_examples_per_class : (i * examples_per_class) + train_examples_per_class + test_examples_per_class])
+        
+        x_test.append(x_ordered[:, (i * examples_per_class) + train_examples_per_class + test_examples_per_class : (i * examples_per_class) + train_examples_per_class + 2 * test_examples_per_class])
+        y_test.append(y_ordered[(i * examples_per_class) + train_examples_per_class + test_examples_per_class : (i * examples_per_class) + train_examples_per_class + 2 * test_examples_per_class])
+        
+    
+    
+    return np.array(x_train), np.array(y_train).flatten(), np.array(x_val), np.array(y_val).flatten(), np.array(x_test), np.array(y_test).flatten()
 
 
 
