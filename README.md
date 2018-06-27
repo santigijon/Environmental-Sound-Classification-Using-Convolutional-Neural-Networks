@@ -2,7 +2,6 @@
 
 **A master thesis project by Santiago Álvarez-Buylla Puente, carried out at Chalmers University of Technology between January and June 2018, for the Sound and Vibration MSc.** 
 
-In this repository the code developed during my master theis project ("Single and Multi-Label Environmental Sound Classification Using Convolutional Neural Networks") is presented. Several jupyter notebooks and python packages are available, as well as some audio files to make the jupyter notebook more interactive. 
 
 
 ## Content of the repository
