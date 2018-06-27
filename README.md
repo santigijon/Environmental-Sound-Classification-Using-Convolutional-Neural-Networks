@@ -18,9 +18,9 @@ And three Python modules:
 - santiago_my_modules_v3_160418.py
 - santiago_my_modules_v3_17_05_18_Multilabel.py
 
-In the two first Jupyter notebooks, the processing of the dataset is performed and explained, both for the single and the multi-label classification tasks. These two files make use of the Python module santiago_data_preprocessing.py
-The two following Jupyter notebooks are the notebooks where the two models are implemented, making use of the two Python modules santiago_my_modules_v3_160418.py and santiago_my_modules_v3_17_05_18_Multilabel.py 
+In the two first Jupyter notebooks, the processing of the dataset is performed and explained, both for the single and the multi-label classification tasks. These two files make use of the Python module *santiago_data_preprocessing.py*  
+The two following Jupyter notebooks are the notebooks where the two models are implemented, making use of the two Python modules *santiago_my_modules_v3_160418.py* and *santiago_my_modules_v3_17_05_18_Multilabel.py*
 
 
-Hope you find it useful.
+Hope you find it useful.  
 Any suggestion is always welcomed!
