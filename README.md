@@ -1,9 +1,9 @@
-# Audio-event-classification-using-artificial-neural-networks
+# Single and Multi-Label Environmental Sound Classification Using Convolutional Neural Networks
 
 In this repository the code developed during my master theis project ("Single and Multi-Label Environmental Sound Classification Using Convolutional Neural Networks") is presented. Several jupyter notebooks and python packages are available, as well as some audio files to make the jupyter notebook more interactive. 
 
 
-## Contents
+## Content of the repository
 
 In the repository, four Jupyter notebooks can be found:
 
